@@ -1,0 +1,43 @@
+﻿<Window x:Class="TaxiWPF.Views.RoleSelectionView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:TaxiWPF.ViewModels"
+        Title="Выбор роли" Height="720" Width="1280" 
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        FontFamily="Segoe UI" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+    <Window.DataContext>
+        <vm:RoleSelectionViewModel/>
+    </Window.DataContext>
+
+    <Border Background="#FDF4CD" CornerRadius="10" BorderBrush="#E0CA8A" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="TAXIWPF" Foreground="#A8986B" FontWeight="Bold" FontSize="12" Margin="15,10" VerticalAlignment="Center"/>
+            <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource CloseButton}" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Кто вы?" FontSize="32" FontWeight="Bold" Margin="0,0,0,30" HorizontalAlignment="Center" Foreground="#333333"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding OpenClientViewCommand}" Style="{StaticResource RoleButton}">
+                        <StackPanel>
+                            <TextBlock Text="👤" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Я пассажир" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding OpenDriverViewCommand}" Style="{StaticResource RoleButton}" Margin="20,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="🚕" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Я водитель" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

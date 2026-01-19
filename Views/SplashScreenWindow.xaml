@@ -1,0 +1,20 @@
+<Window x:Class="TaxiWPF.Views.SplashScreenWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TaxiWPF" 
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        Background="Black"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        ShowInTaskbar="True">
+    <Grid>
+        <MediaElement x:Name="VideoPlayer"
+                      LoadedBehavior="Manual"
+                      UnloadedBehavior="Stop"
+                      Stretch="Uniform"
+                      MediaEnded="VideoPlayer_MediaEnded"
+                      MediaFailed="VideoPlayer_MediaFailed"/>
+    </Grid>
+</Window>
+

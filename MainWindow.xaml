@@ -1,0 +1,94 @@
+﻿<Window x:Class="TaxiWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Управление водителями такси" Height="720" Width="1280">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        
+        <TextBlock Text="Список водителей" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+
+        
+        <DataGrid Grid.Row="1" 
+                  ItemsSource="{Binding Drivers}" 
+                  SelectedItem="{Binding SelectedDriver}"
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True"
+                  SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding driver_id}" Width="50"/>
+                <DataGridTextColumn Header="ФИО" Binding="{Binding full_name}" Width="*"/>
+                <DataGridTextColumn Header="Авто" Binding="{Binding car_model}" Width="*"/>
+                <DataGridTextColumn Header="Номер" Binding="{Binding license_plate}" Width="*"/>
+                <DataGridTextColumn Header="Статус" Binding="{Binding status}" Width="*"/>
+                <DataGridTextColumn Header="Телефон" Binding="{Binding phone}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        
+        <StackPanel Grid.Row="2" Margin="0,10,0,0">
+            <TextBlock Text="Редактирование водителя" FontWeight="Bold" Margin="0,0,0,5"/>
+
+           
+            <GroupBox Header="Основная информация" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        
+                    </Grid.RowDefinitions>
+
+                    
+                    <Label Grid.Row="0" Grid.Column="0" Content="ФИО" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0,0,0"/>
+                    <Label Grid.Row="0" Grid.Column="1" Content="Модель авто" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0,0,0"/>
+                    <Label Grid.Row="0" Grid.Column="2" Content="Гос. номер" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0,0,0"/>
+
+                    
+                    <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding SelectedDriver.full_name}" Margin="0,0,5,5" Padding="5"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedDriver.car_model}" Margin="5,0,5,5" Padding="5"/>
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding SelectedDriver.license_plate}" Margin="5,0,0,5" Padding="5"/>
+
+                   
+                    <Label Grid.Row="2" Grid.Column="0" Content="Статус" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0,0,0"/>
+                    <Label Grid.Row="2" Grid.Column="1" Content="Телефон" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0,0,0"/>
+                    <Label Grid.Row="2" Grid.Column="2" Content="Координаты" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0,0,0"/>
+
+                    
+                    <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding SelectedDriver.status}" Margin="0,0,5,0" Padding="5"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedDriver.phone}" Margin="5,0,5,0" Padding="5"/>
+                    <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding SelectedDriver.geo_position}" Margin="5,0,0,0" Padding="5"/>
+                </Grid>
+            </GroupBox>
+
+            
+            <GroupBox Header="Дополнительно" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Рейтинг (0.00 - 5.00)" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox Grid.Column="1" Text="{Binding SelectedDriver.rating, StringFormat=N2}" Padding="5"/>
+                </Grid>
+            </GroupBox>
+
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Content="Добавить" Command="{Binding AddCommand}" Width="100" Margin="0,0,10,0" Padding="5"/>
+                <Button Content="Сохранить" Command="{Binding SaveCommand}" Width="100" Margin="0,0,10,0" Padding="5"/>
+                <Button Content="Удалить" Command="{Binding DeleteCommand}" Width="100" Padding="5"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
