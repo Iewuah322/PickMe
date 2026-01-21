@@ -1,4 +1,4 @@
-﻿<Window x:Class="TaxiWPF.Views.ClientView"
+<Window x:Class="TaxiWPF.Views.ClientView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:TaxiWPF.ViewModels"
@@ -14,7 +14,7 @@
         <Grid>
             <Button Command="{Binding ToggleProfilePanelCommand}" Style="{StaticResource AvatarButton}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,15,0,0">
                 <Grid Width="30" Height="30">
-                    <TextBlock Text="👤" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <TextBlock Text="П" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <Ellipse>
                         <Ellipse.Fill>
                             <ImageBrush ImageSource="{Binding CurrentUser.DriverPhotoUrl, Converter={StaticResource PathToImageConverter}}"/>
@@ -22,7 +22,7 @@
                     </Ellipse>
                 </Grid>
             </Button>
-            <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource CloseButton}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0"/>
+            <Button Content="X" Click="CloseButton_Click" Style="{StaticResource CloseButton}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0"/>
 
             <!-- Карта по центру с отступами (70% ширины) -->
             <Grid Margin="100,35,100,100">
@@ -107,8 +107,8 @@
                                     <ComboBox ItemsSource="{Binding Tariffs}" SelectedItem="{Binding SelectedTariff}" Margin="0,0,0,25" Style="{StaticResource CustomComboBox}"/>
                                     <TextBlock Text="Способ оплаты:" Style="{StaticResource InputLabel}"/>
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                        <RadioButton Content="💳 Карта" GroupName="Payment" IsChecked="{Binding IsCardPayment}"/>
-                                        <RadioButton Content="💵 Наличные" GroupName="Payment" IsChecked="{Binding IsCashPayment}" Margin="15,0,0,0"/>
+                                        <RadioButton Content="Карта" GroupName="Payment" IsChecked="{Binding IsCardPayment}"/>
+                                        <RadioButton Content="Наличные" GroupName="Payment" IsChecked="{Binding IsCashPayment}" Margin="15,0,0,0"/>
                                     </StackPanel>
 
                                     <StackPanel Visibility="{Binding IsCardPayment, Converter={StaticResource BoolToVis}}">
@@ -205,17 +205,17 @@
 
                                 <TextBlock Text="Оцените поездку:" Style="{StaticResource InputLabel}" HorizontalAlignment="Center"/>
                                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
-                                    <RadioButton GroupName="Rating" Tag="1" Content="★" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
-                                    <RadioButton GroupName="Rating" Tag="2" Content="★" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
-                                    <RadioButton GroupName="Rating" Tag="3" Content="★" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
-                                    <RadioButton GroupName="Rating" Tag="4" Content="★" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
-                                    <RadioButton GroupName="Rating" Tag="5" Content="★" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                                    <RadioButton GroupName="Rating" Tag="1" Content="*" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                                    <RadioButton GroupName="Rating" Tag="2" Content="*" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                                    <RadioButton GroupName="Rating" Tag="3" Content="*" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                                    <RadioButton GroupName="Rating" Tag="4" Content="*" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                                    <RadioButton GroupName="Rating" Tag="5" Content="*" FontSize="30" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
                                 </StackPanel>
                                 <TextBlock Text="Дополнительно:" Style="{StaticResource InputLabel}" Margin="0,15,0,5" HorizontalAlignment="Center"/>
                                 <WrapPanel HorizontalAlignment="Center">
-                                    <ToggleButton Content="👍 Вежливость" IsChecked="{Binding WasPolite}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
-                                    <ToggleButton Content="✨ Чистота" IsChecked="{Binding WasClean}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
-                                    <ToggleButton Content="🚗 Вождение" IsChecked="{Binding GoodDriving}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
+                                    <ToggleButton Content="Вежливость" IsChecked="{Binding WasPolite}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
+                                    <ToggleButton Content="Чистота" IsChecked="{Binding WasClean}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
+                                    <ToggleButton Content="Вождение" IsChecked="{Binding GoodDriving}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
                                 </WrapPanel>
                                 <Button Content="ОТПРАВИТЬ ОЦЕНКУ" Command="{Binding RateDriverCommand}" Style="{StaticResource PrimaryButton}" Margin="0,15,0,0"/>
                                 <Button Content="Пропустить" Command="{Binding SkipRatingCommand}"
@@ -295,7 +295,7 @@
                         <Grid>
                             <TextBlock Text="Введите адреса" FontSize="18" FontWeight="Bold" 
                                        VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#333333"/>
-                            <Button x:Name="AddressCollapseButton" Content="▼" Click="CollapseAddressPanel_Click" 
+                            <Button x:Name="AddressCollapseButton" Content="v" Click="CollapseAddressPanel_Click"
                                     HorizontalAlignment="Stretch" 
                                     HorizontalContentAlignment="Right"
                                     Height="60"
@@ -388,7 +388,7 @@
                         <Grid>
                             <TextBlock Text="Выберите тариф" FontSize="18" FontWeight="Bold" 
                                        VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#333333"/>
-                            <Button x:Name="TariffCollapseButton" Content="▼" Click="CollapseTariffPanel_Click" 
+                            <Button x:Name="TariffCollapseButton" Content="v" Click="CollapseTariffPanel_Click"
                                     HorizontalAlignment="Right" 
                                     Width="40" Height="40"
                                     Background="Transparent"
@@ -638,7 +638,7 @@
                         <Grid>
                             <TextBlock Text="Способ оплаты" FontSize="18" FontWeight="Bold" 
                                        VerticalAlignment="Center" Margin="20,0,0,0" Foreground="#333333"/>
-                            <Button x:Name="PaymentCollapseButton" Content="▼" Click="CollapsePaymentPanel_Click" 
+                            <Button x:Name="PaymentCollapseButton" Content="v" Click="CollapsePaymentPanel_Click"
                                     HorizontalAlignment="Right" 
                                     Width="40" Height="40"
                                     Background="Transparent"
@@ -689,8 +689,8 @@
                         <!-- Выбор оплаты -->
                         <TextBlock Text="Способ оплаты:" Style="{StaticResource InputLabel}" FontSize="16" Margin="0,0,0,15" Foreground="#333333"/>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                            <RadioButton Content="💳 Карта" GroupName="Payment" IsChecked="{Binding IsCardPayment}" FontSize="16" Margin="0,0,30,0" Foreground="#333"/>
-                            <RadioButton Content="💵 Наличные" GroupName="Payment" IsChecked="{Binding IsCashPayment}" FontSize="16" Foreground="#333"/>
+                            <RadioButton Content="Карта" GroupName="Payment" IsChecked="{Binding IsCardPayment}" FontSize="16" Margin="0,0,30,0" Foreground="#333"/>
+                            <RadioButton Content="Наличные" GroupName="Payment" IsChecked="{Binding IsCashPayment}" FontSize="16" Foreground="#333"/>
                         </StackPanel>
 
                         <StackPanel Visibility="{Binding IsCardPayment, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -801,7 +801,7 @@
                 <StackPanel>
                     <Grid Margin="0,0,0,15">
                         <TextBlock Text="Ваш заказ" FontSize="16" FontWeight="Bold" Foreground="#333" VerticalAlignment="Center"/>
-                        <Button Content="✏️ Изменить" 
+                        <Button Content="Изменить" 
                                 Command="{Binding EditOrderCommand}"
                                 HorizontalAlignment="Right"
                                 Background="Transparent"
@@ -865,17 +865,17 @@
                     <DropShadowEffect BlurRadius="20" ShadowDepth="5" Opacity="0.3" Color="Black"/>
                 </Border.Effect>
                 <StackPanel>
-                    <TextBlock Text="🔍 Поиск водителя..." FontSize="22" FontWeight="Bold" Foreground="#333333" Margin="0,0,0,15"/>
+                    <TextBlock Text="Поиск водителя..." FontSize="22" FontWeight="Bold" Foreground="#333333" Margin="0,0,0,15"/>
                     <TextBlock Text="{Binding StatusMessage}" FontSize="14" Foreground="#666666" TextWrapping="Wrap" Margin="0,0,0,20"/>
                     
                     <Border Background="#F5F5F5" CornerRadius="10" Padding="15" Margin="0,0,0,15">
                         <StackPanel>
                             <TextBlock FontSize="14" Foreground="#666666" TextWrapping="Wrap">
-                                <Run Text="📍 От: " FontWeight="SemiBold"/>
+                                <Run Text="От:" FontWeight="SemiBold"/>
                                 <Run Text="{Binding FromAddress}"/>
                             </TextBlock>
                             <TextBlock FontSize="14" Foreground="#666666" TextWrapping="Wrap" Margin="0,8,0,0">
-                                <Run Text="🎯 До: " FontWeight="SemiBold"/>
+                                <Run Text="До:" FontWeight="SemiBold"/>
                                 <Run Text="{Binding ToAddress}"/>
                             </TextBlock>
                         </StackPanel>
@@ -951,11 +951,11 @@
                     <Border Background="#F5F5F5" CornerRadius="10" Padding="15" Margin="0,0,0,15">
                         <StackPanel>
                             <TextBlock FontSize="14" Foreground="#666666" TextWrapping="Wrap">
-                                <Run Text="📍 От: " FontWeight="SemiBold"/>
+                                <Run Text="От:" FontWeight="SemiBold"/>
                                 <Run Text="{Binding CurrentOrder.PointA}"/>
                             </TextBlock>
                             <TextBlock FontSize="14" Foreground="#666666" TextWrapping="Wrap" Margin="0,8,0,0">
-                                <Run Text="🎯 До: " FontWeight="SemiBold"/>
+                                <Run Text="До:" FontWeight="SemiBold"/>
                                 <Run Text="{Binding CurrentOrder.PointB}"/>
                             </TextBlock>
                         </StackPanel>
@@ -983,18 +983,18 @@
                     <DropShadowEffect BlurRadius="20" ShadowDepth="5" Opacity="0.3" Color="Black"/>
                 </Border.Effect>
                 <StackPanel>
-                    <TextBlock Text="🎉 Поездка завершена!" FontSize="22" FontWeight="Bold" Foreground="#333333" Margin="0,0,0,5"/>
+                    <TextBlock Text="Поездка завершена!" FontSize="22" FontWeight="Bold" Foreground="#333333" Margin="0,0,0,5"/>
                     <TextBlock Text="Оцените водителя" FontSize="16" Foreground="#666666" Margin="0,0,0,20"/>
                     
                     <!-- Информация о поездке -->
                     <Border Background="#F5F5F5" CornerRadius="10" Padding="15" Margin="0,0,0,20">
                         <StackPanel>
                             <TextBlock FontSize="14" Foreground="#666666" TextWrapping="Wrap">
-                                <Run Text="📍 От: "/>
+                                <Run Text="От:"/>
                                 <Run Text="{Binding CurrentOrder.PointA}"/>
                             </TextBlock>
                             <TextBlock FontSize="14" Foreground="#666666" TextWrapping="Wrap" Margin="0,5,0,0">
-                                <Run Text="🎯 До: "/>
+                                <Run Text="До:"/>
                                 <Run Text="{Binding CurrentOrder.PointB}"/>
                             </TextBlock>
                             <TextBlock FontSize="18" FontWeight="Bold" Foreground="#FFC107" Margin="0,10,0,0">
@@ -1007,19 +1007,19 @@
                     <!-- Рейтинг звездами -->
                     <TextBlock Text="Ваша оценка:" FontSize="14" FontWeight="SemiBold" Foreground="#333333" Margin="0,0,0,10" HorizontalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15">
-                        <RadioButton GroupName="NewRating" Tag="1" Content="★" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
-                        <RadioButton GroupName="NewRating" Tag="2" Content="★" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
-                        <RadioButton GroupName="NewRating" Tag="3" Content="★" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
-                        <RadioButton GroupName="NewRating" Tag="4" Content="★" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
-                        <RadioButton GroupName="NewRating" Tag="5" Content="★" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                        <RadioButton GroupName="NewRating" Tag="1" Content="*" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                        <RadioButton GroupName="NewRating" Tag="2" Content="*" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                        <RadioButton GroupName="NewRating" Tag="3" Content="*" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                        <RadioButton GroupName="NewRating" Tag="4" Content="*" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
+                        <RadioButton GroupName="NewRating" Tag="5" Content="*" FontSize="32" Checked="RatingButton_Checked" Style="{StaticResource RatingButtonStyle}"/>
                     </StackPanel>
                     
                     <!-- Дополнительные критерии -->
                     <TextBlock Text="Дополнительно:" FontSize="14" Foreground="#666666" Margin="0,0,0,10" HorizontalAlignment="Center"/>
                     <WrapPanel HorizontalAlignment="Center" Margin="0,0,0,20">
-                        <ToggleButton Content="👍 Вежливость" IsChecked="{Binding WasPolite}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
-                        <ToggleButton Content="✨ Чистота" IsChecked="{Binding WasClean}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
-                        <ToggleButton Content="🚗 Вождение" IsChecked="{Binding GoodDriving}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
+                        <ToggleButton Content="Вежливость" IsChecked="{Binding WasPolite}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
+                        <ToggleButton Content="Чистота" IsChecked="{Binding WasClean}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
+                        <ToggleButton Content="Вождение" IsChecked="{Binding GoodDriving}" Style="{StaticResource RatingCriteriaToggleStyle}"/>
                     </WrapPanel>
                     
                     <Button Content="ОТПРАВИТЬ ОЦЕНКУ" Command="{Binding RateDriverCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,0,10"/>
@@ -1095,7 +1095,7 @@
                                         <Ellipse.OpacityMask>
                                             <VisualBrush>
                                                 <VisualBrush.Visual>
-                                                    <TextBlock Text="👤" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="П" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </VisualBrush.Visual>
                                             </VisualBrush>
                                         </Ellipse.OpacityMask>
@@ -1105,31 +1105,31 @@
                                     <TextBlock Text="{Binding CurrentUser.full_name}" FontSize="24" FontWeight="Bold" Foreground="#333333"/>
                                     <TextBlock Text="{Binding CurrentUser.email}" FontSize="14" Foreground="#666666" Margin="0,5,0,0"/>
                                     <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                        <TextBlock Text="⭐" Foreground="#FFC107" VerticalAlignment="Center"/>
+                                        <TextBlock Text="*" Foreground="#FFC107" VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding CurrentUser.rating, StringFormat=F2, FallbackValue='N/A'}" FontSize="14" FontWeight="SemiBold" Foreground="#333333" Margin="5,0,0,0"/>
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                <Button Content="🎁 Промокод" 
+                                <Button Content="Промокод" 
                                         Command="{Binding OpenPromoCodeCommand}"
                                         Style="{StaticResource PrimaryButton}" 
                                         Margin="0,0,10,0"
                                         Padding="15,8"
                                         FontSize="14"/>
-                                <Button Content="⚙️ Настройки" 
+                                <Button Content="Настройки" 
                                         Command="{Binding OpenSettingsCommand}"
                                         Style="{StaticResource PrimaryButton}" 
                                         Margin="0,0,10,0"
                                         Padding="15,8"
                                         FontSize="14"/>
-                                <Button Content="💬 Поддержка" 
+                                <Button Content="Поддержка" 
                                         Command="{Binding ContactSupportCommand}"
                                         Style="{StaticResource PrimaryButton}" 
                                         Margin="0,0,10,0"
                                         Padding="15,8"
                                         FontSize="14"/>
-                                <Button Content="✕" 
+                                <Button Content="X" 
                                         Click="CloseProfilePanel_Click"
                                         Width="35" 
                                         Height="35"
@@ -1275,8 +1275,8 @@
                             CornerRadius="20,20,0,0" 
                             Padding="25,20">
                         <Grid>
-                            <TextBlock Text="⚙️ Настройки" FontSize="24" FontWeight="Bold" Foreground="#333333" VerticalAlignment="Center"/>
-                            <Button Content="✕" 
+                            <TextBlock Text="Настройки" FontSize="24" FontWeight="Bold" Foreground="#333333" VerticalAlignment="Center"/>
+                            <Button Content="X" 
                                     Click="CloseSettingsPanel_Click"
                                     Width="35" 
                                     Height="35"
@@ -1368,8 +1368,8 @@
                 </Border.Effect>
                 <StackPanel>
                     <Grid Margin="0,0,0,20">
-                        <TextBlock Text="🎁 Активировать промокод" FontSize="20" FontWeight="Bold" Foreground="#333333" VerticalAlignment="Center"/>
-                        <Button Content="✕" 
+                        <TextBlock Text="Активировать промокод" FontSize="20" FontWeight="Bold" Foreground="#333333" VerticalAlignment="Center"/>
+                        <Button Content="X" 
                                 Command="{Binding ClosePromoCodePanelCommand}"
                                 Width="30" 
                                 Height="30"
@@ -1425,7 +1425,7 @@
                             Margin="0,0,0,15"
                             Visibility="{Binding HasActivePromoCode, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <StackPanel>
-                            <TextBlock Text="✅ Активный промокод:" FontWeight="Bold" Foreground="#2E7D32" Margin="0,0,0,5"/>
+                            <TextBlock Text="Активный промокод:" FontWeight="Bold" Foreground="#2E7D32" Margin="0,0,0,5"/>
                             <TextBlock Text="Скидка 15% на тарифы Комфорт и Бизнес" Foreground="#388E3C"/>
                             <TextBlock Foreground="#388E3C" Margin="0,5,0,0">
                                 <Run Text="Осталось поездок: "/>
