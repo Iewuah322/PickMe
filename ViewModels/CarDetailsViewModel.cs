@@ -100,10 +100,14 @@ namespace TaxiWPF.ViewModels
             RemovePhotoUrlCommand = _removePhotoUrlCommand;
 
             // --- Инициализация галереи ---
+
             if (Car.PhotoGallery == null)
             {
                 Car.PhotoGallery = new List<string>();
             }
+
+           
+
             PhotoGallery = new ObservableCollection<string>();
             // Добавляем главное фото
             if (!string.IsNullOrEmpty(Car.MainImageUrl))
@@ -144,10 +148,12 @@ namespace TaxiWPF.ViewModels
                 {
                     // Добавляем и в UI, и в саму модель
                     PhotoGallery.Add(newPath);
+
                     if (Car.PhotoGallery == null)
                     {
                         Car.PhotoGallery = new List<string>();
                     }
+
                     Car.PhotoGallery.Add(newPath);
                     
                     // Сразу выбираем новое фото
@@ -234,10 +240,12 @@ namespace TaxiWPF.ViewModels
 
             // Добавляем и в UI, и в саму модель
             PhotoGallery.Add(NewPhotoUrl);
+
             if (Car.PhotoGallery == null)
             {
                 Car.PhotoGallery = new List<string>();
             }
+
             Car.PhotoGallery.Add(NewPhotoUrl);
 
             // Если это первое фото, делаем его главным
