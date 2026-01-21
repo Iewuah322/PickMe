@@ -74,6 +74,7 @@ namespace TaxiWPF.ViewModels
         private DispatcherTimer _orderTimer;
         private readonly RatingRepository _ratingRepository;
         private readonly OrderRepository _orderRepository;
+        private readonly Random _random = new Random();
        
 
         // Таймеры УДАЛЕНЫ
@@ -222,6 +223,7 @@ namespace TaxiWPF.ViewModels
 
         // Кнопка StartTripCommand УДАЛЕНА
         public ICommand RateDriverCommand { get; }
+        public event Action<PointLatLng, PointLatLng> VirtualDriverAssigned;
 
         public User CurrentUser
         {
@@ -573,6 +575,48 @@ namespace TaxiWPF.ViewModels
             };
 
             CurrentOrder = await OrderService.Instance.SubmitOrderAsync(newOrder);
+            StartOrderAssignmentTimer();
+        }
+
+        private void StartOrderAssignmentTimer()
+        {
+            if (_orderTimer != null)
+            {
+                _orderTimer.Stop();
+                _orderTimer.Tick -= OrderTimer_Tick;
+            }
+
+            var delaySeconds = _random.Next(10, 31);
+            _orderTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(delaySeconds)
+            };
+            _orderTimer.Tick += OrderTimer_Tick;
+            _orderTimer.Start();
+        }
+
+        private void OrderTimer_Tick(object sender, EventArgs e)
+        {
+            _orderTimer.Stop();
+            _orderTimer.Tick -= OrderTimer_Tick;
+
+            if (CurrentOrderState != OrderState.Searching || CurrentOrder == null)
+            {
+                return;
+            }
+
+            var virtualDriver = new Driver
+            {
+                driver_id = _random.Next(1000, 9999),
+                full_name = "Виртуальный водитель",
+                car_model = "Такси",
+                license_plate = "А000АА74",
+                rating = 4.8m,
+                phone = "+7 (900) 000-00-00"
+            };
+
+            OrderService.Instance.AcceptOrder(CurrentOrder, virtualDriver);
+            VirtualDriverAssigned?.Invoke(PointA, PointB);
         }
 
         private void ValidateCardNumber(bool force = false)
@@ -595,7 +639,39 @@ namespace TaxiWPF.ViewModels
         {
             // (В идеале, надо оповестить сервис, но пока просто сбросим у себя)
             OrderService.Instance.ArchiveOrder(CurrentOrder); // Используем Archive
+            if (_orderTimer != null)
+            {
+                _orderTimer.Stop();
+                _orderTimer.Tick -= OrderTimer_Tick;
+            }
             ResetToIdleState();
+        }
+
+        public void HandlePickupReached()
+        {
+            if (CurrentOrder == null)
+            {
+                return;
+            }
+
+            OrderService.Instance.DriverArrived(CurrentOrder);
+            var startTripTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            startTripTimer.Tick += (s, e) =>
+            {
+                startTripTimer.Stop();
+                OrderService.Instance.StartTrip(CurrentOrder);
+            };
+            startTripTimer.Start();
+        }
+
+        public void HandleTripCompleted()
+        {
+            if (CurrentOrder == null)
+            {
+                return;
+            }
+
+            OrderService.Instance.CompleteOrder(CurrentOrder);
         }
 
         private async void RateDriver()

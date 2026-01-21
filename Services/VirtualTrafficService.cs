@@ -84,19 +84,32 @@ namespace TaxiWPF.Services
             _timer = null;
         }
 
+        public event Action OrderPickupReached;
+        public event Action OrderCompleted;
+
         public void SimulateOrder(PointLatLng clientLocation)
         {
-            if (!_isRunning || _mainMap == null || clientLocation.IsEmpty)
+            AssignOrder(clientLocation, clientLocation);
+        }
+
+        public bool AssignOrder(PointLatLng pickupLocation, PointLatLng dropoffLocation)
+        {
+            if (!_isRunning || _mainMap == null || pickupLocation.IsEmpty)
             {
-                return;
+                return false;
             }
 
             if (_drivers.Count == 0)
             {
-                return;
+                return false;
             }
 
-            var marker = new GMapMarker(clientLocation)
+            if (dropoffLocation.IsEmpty)
+            {
+                dropoffLocation = pickupLocation;
+            }
+
+            var marker = new GMapMarker(pickupLocation)
             {
                 Shape = new Ellipse
                 {
@@ -121,7 +134,9 @@ namespace TaxiWPF.Services
                     continue;
                 }
 
-                var distance = GetDistanceInMeters(driver.Marker.Position, clientLocation);
+
+                var distance = GetDistanceInMeters(driver.Marker.Position, pickupLocation);
+
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
@@ -131,13 +146,18 @@ namespace TaxiWPF.Services
 
             if (closestDriver == null)
             {
-                return;
+                return false;
             }
 
             closestDriver.IsBusy = true;
             closestDriver.IsStopped = false;
+
+            closestDriver.IsOnTrip = false;
+            closestDriver.TripDestination = dropoffLocation;
+
             closestDriver.CarShape.Fill = Brushes.Red;
-            UpdateRouteForDriver(closestDriver, closestDriver.Marker.Position, clientLocation);
+            UpdateRouteForDriver(closestDriver, closestDriver.Marker.Position, pickupLocation);
+            return true;
         }
 
         private void OnTick(object sender, EventArgs e)
@@ -181,14 +201,25 @@ namespace TaxiWPF.Services
             }
         }
 
-        private Rectangle CreateDriverShape()
+        private Shape CreateDriverShape()
         {
             var rotation = new RotateTransform(0);
-            return new Rectangle
+            return new Polygon
             {
-                Width = 10,
-                Height = 20,
                 Fill = Brushes.Black,
+                Stroke = Brushes.Black,
+                StrokeThickness = 0.5,
+                Points = new PointCollection
+                {
+                    new Point(0, 22),
+                    new Point(12, 22),
+                    new Point(12, 8),
+                    new Point(7, 8),
+                    new Point(6, 0),
+                    new Point(5, 0),
+                    new Point(4, 8),
+                    new Point(0, 8)
+                },
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 RenderTransform = rotation
             };
@@ -218,7 +249,21 @@ namespace TaxiWPF.Services
                     if (driver.IsBusy)
                     {
                         driver.Marker.Position = driver.RoutePoints.Last();
+
+                        if (!driver.IsOnTrip)
+                        {
+                            driver.IsOnTrip = true;
+                            OrderPickupReached?.Invoke();
+                            UpdateRouteForDriver(driver, driver.Marker.Position, driver.TripDestination);
+                            return;
+                        }
+
+                        driver.IsBusy = false;
+                        driver.IsOnTrip = false;
                         driver.IsStopped = true;
+                        driver.CarShape.Fill = Brushes.Black;
+                        OrderCompleted?.Invoke();
+
                         return;
                     }
 
@@ -230,12 +275,14 @@ namespace TaxiWPF.Services
                 var nextPoint = driver.RoutePoints[driver.RouteIndex + 1];
                 var segmentDistance = GetDistanceInMeters(currentPoint, nextPoint);
 
+
                 if (segmentDistance <= 0.01)
                 {
                     driver.RouteIndex++;
                     driver.SegmentProgress = 0;
                     continue;
                 }
+
 
                 var remainingSegment = segmentDistance * (1 - driver.SegmentProgress);
                 if (remainingDistance < remainingSegment)
@@ -295,7 +342,7 @@ namespace TaxiWPF.Services
         {
             var deltaLat = next.Lat - current.Lat;
             var deltaLng = next.Lng - current.Lng;
-            return Math.Atan2(deltaLat, deltaLng) * 180 / Math.PI;
+            return Math.Atan2(deltaLng, deltaLat) * 180 / Math.PI;
         }
 
         private static double GetDistanceInMeters(PointLatLng start, PointLatLng end)
@@ -321,13 +368,17 @@ namespace TaxiWPF.Services
         private class VirtualDriver
         {
             public GMapMarker Marker { get; set; }
-            public Rectangle CarShape { get; set; }
+            public Shape CarShape { get; set; }
             public RotateTransform Rotation { get; set; }
             public List<PointLatLng> RoutePoints { get; set; } = new List<PointLatLng>();
             public int RouteIndex { get; set; }
             public double SegmentProgress { get; set; }
             public bool IsBusy { get; set; }
             public bool IsStopped { get; set; }
+
+            public bool IsOnTrip { get; set; }
+            public PointLatLng TripDestination { get; set; }
+
         }
     }
 }
