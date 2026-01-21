@@ -104,11 +104,24 @@
                                                    Foreground="#333333" 
                                                    Margin="0,0,0,10"/>
                                         <ListBox ItemsSource="{Binding PhotoGallery}" 
-                                                 SelectedItem="{Binding SelectedPhotoUrl}"
+                                                 SelectedItem="{Binding SelectedPhotoUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                  Background="Transparent"
                                                  BorderThickness="0"
                                                  ScrollViewer.HorizontalScrollBarVisibility="Auto" 
                                                  ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Command="{Binding DataContext.SelectPhotoCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                            CommandParameter="{Binding}"
+                                                            Background="Transparent"
+                                                            BorderThickness="0"
+                                                            Padding="0"
+                                                            Cursor="Hand">
+                                                        <Image Source="{Binding Converter={StaticResource PathToImageConverter}}" 
+                                                               Stretch="UniformToFill"/>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
                                             <ListBox.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel Orientation="Horizontal"/>
@@ -116,6 +129,8 @@
                                             </ListBox.ItemsPanel>
                                             <ListBox.ItemContainerStyle>
                                                 <Style TargetType="ListBoxItem">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
                                                     <Setter Property="Template">
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="ListBoxItem">
@@ -128,8 +143,7 @@
                                                                         BorderBrush="#E8E8E8"
                                                                         BorderThickness="1"
                                                                         Cursor="Hand">
-                                                                    <Image Source="{Binding Converter={StaticResource PathToImageConverter}}" 
-                                                                           Stretch="UniformToFill"/>
+                                                                    <ContentPresenter />
                                                                 </Border>
                                                                 <ControlTemplate.Triggers>
                                                                     <Trigger Property="IsSelected" Value="True">
