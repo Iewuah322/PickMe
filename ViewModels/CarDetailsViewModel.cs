@@ -21,6 +21,7 @@ namespace TaxiWPF.ViewModels
         private readonly User _driver;
         private Car _car;
         private string _newPhotoUrl;
+        private readonly RelayCommand _removePhotoUrlCommand;
         public string NewPhotoUrl { get => _newPhotoUrl; set { _newPhotoUrl = value; OnPropertyChanged(); } }
 
         private bool _isAddMode; // Режим "Добавление" (true) или "Просмотр" (false)
@@ -48,17 +49,19 @@ namespace TaxiWPF.ViewModels
                 // --- КОНЕЦ ИЗМЕНЕНИЯ ---
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Car)); // Оповещаем UI, что свойство Car изменилось
+                _removePhotoUrlCommand?.RaiseCanExecuteChanged();
             }
         }
 
         public ICommand CloseCommand { get; }
         public ICommand SaveCommand { get; }
         
-        public ICommand RemovePhotoUrlCommand { get; } // Заглушка
+        public ICommand RemovePhotoUrlCommand { get; }
         public ICommand DeleteCarCommand { get; }
 
         public ICommand SelectMainPhotoCommand { get; }
         public ICommand AddPhotoToGalleryCommand { get; }
+        public ICommand SelectPhotoCommand { get; }
 
 
         // Событие для закрытия
@@ -89,12 +92,15 @@ namespace TaxiWPF.ViewModels
             DeleteCarCommand = new RelayCommand(DeleteCar, () => !IsAddMode); // Удалять можно только существующую
             SelectMainPhotoCommand = new RelayCommand(SelectMainPhoto);
             AddPhotoToGalleryCommand = new RelayCommand(AddPhotoToGallery);
+            SelectPhotoCommand = new RelayCommand<string>(SelectPhoto);
 
             // --- Заглушки для фото ---
 
-            RemovePhotoUrlCommand = new RelayCommand(RemovePhotoUrl, () => !string.IsNullOrEmpty(SelectedPhotoUrl));
+            _removePhotoUrlCommand = new RelayCommand(RemovePhotoUrl, () => !string.IsNullOrEmpty(SelectedPhotoUrl));
+            RemovePhotoUrlCommand = _removePhotoUrlCommand;
 
             // --- Инициализация галереи ---
+            Car.PhotoGallery ??= new List<string>();
             PhotoGallery = new ObservableCollection<string>();
             // Добавляем главное фото
             if (!string.IsNullOrEmpty(Car.MainImageUrl))
@@ -135,12 +141,24 @@ namespace TaxiWPF.ViewModels
                 {
                     // Добавляем и в UI, и в саму модель
                     PhotoGallery.Add(newPath);
+                    Car.PhotoGallery ??= new List<string>();
                     Car.PhotoGallery.Add(newPath);
                     
                     // Сразу выбираем новое фото
                     SelectedPhotoUrl = newPath;
+                    OnPropertyChanged(nameof(PhotoGallery));
                 }
             }
+        }
+
+        private void SelectPhoto(string photoUrl)
+        {
+            if (string.IsNullOrEmpty(photoUrl))
+            {
+                return;
+            }
+
+            SelectedPhotoUrl = photoUrl;
         }
 
         private string CopyImageToAppData(string sourceImagePath)
@@ -210,6 +228,7 @@ namespace TaxiWPF.ViewModels
 
             // Добавляем и в UI, и в саму модель
             PhotoGallery.Add(NewPhotoUrl);
+            Car.PhotoGallery ??= new List<string>();
             Car.PhotoGallery.Add(NewPhotoUrl);
 
             // Если это первое фото, делаем его главным
@@ -237,6 +256,7 @@ namespace TaxiWPF.ViewModels
             PhotoGallery.Remove(SelectedPhotoUrl);
 
             SelectedPhotoUrl = PhotoGallery.FirstOrDefault(); // Выбираем первое
+            _removePhotoUrlCommand?.RaiseCanExecuteChanged();
         }
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
