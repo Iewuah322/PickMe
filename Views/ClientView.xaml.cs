@@ -18,6 +18,7 @@ using GMap.NET.MapProviders;
 using GMap.NET.WindowsPresentation;
 using TaxiWPF.ViewModels;
 using TaxiWPF.Models;
+using TaxiWPF.Services;
 using BookingStep = TaxiWPF.ViewModels.BookingStep;
 
 
@@ -31,6 +32,7 @@ namespace TaxiWPF.Views
         private GMapMarker _markerB;
         private GMapRoute _currentRoute;
         private ClientViewModel _viewModel;
+        private VirtualTrafficService _virtualTrafficService;
 
         public ClientView()
         {
@@ -116,6 +118,9 @@ namespace TaxiWPF.Views
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 InitializeMap();
+                _virtualTrafficService = new VirtualTrafficService();
+                _virtualTrafficService.Initialize(MainMap);
+                _virtualTrafficService.Start();
             }), System.Windows.Threading.DispatcherPriority.Loaded);
             MainMap.CanDragMap = true;
             MainMap.DragButton = MouseButton.Right;
@@ -124,6 +129,8 @@ namespace TaxiWPF.Views
             MainMap.MouseMove += MainMap_MouseMove;
             // Переименуем старый обработчик
             MainMap.MouseLeftButtonDown += MainMap_PreviewMouseLeftButtonDown;
+
+            Closing += ClientView_Closing;
         }
 
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -359,6 +366,7 @@ namespace TaxiWPF.Views
             // Сразу запускаем поиск водителя
             if (_viewModel != null && _viewModel.FindTaxiCommand.CanExecute(null))
             {
+                SimulateOrder(_viewModel.PointA);
                 _viewModel.FindTaxiCommand.Execute(null);
             }
         }
@@ -550,6 +558,11 @@ namespace TaxiWPF.Views
                 // MainMap.ZoomAndCenterMarkers(null);
             }
         }
+
+        private void SimulateOrder(PointLatLng clientLocation)
+        {
+            _virtualTrafficService?.SimulateOrder(clientLocation);
+        }
        
 
         private void MainMap_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -655,6 +668,11 @@ namespace TaxiWPF.Views
             {
                 DrawRoute(_viewModel.PointA, _viewModel.PointB);
             }
+        }
+
+        private void ClientView_Closing(object sender, CancelEventArgs e)
+        {
+            _virtualTrafficService?.Stop();
         }
 
 
