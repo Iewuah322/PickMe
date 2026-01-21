@@ -58,54 +58,15 @@ namespace TaxiWPF.Views
 
             this.DataContextChanged += (sender, args) =>
             {
-                // Отписываемся от старого ViewModel (на всякий случай)
-                if (_viewModel != null)
-                {
-                    _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
-                }
-
-                // Получаем НОВЫЙ ViewModel, который нам передал LoginViewModel
+                UnsubscribeFromViewModel();
                 _viewModel = DataContext as ClientViewModel;
-                
-                // Подписываемся на изменение CurrentBookingStep для анимации
-                if (_viewModel != null)
-                {
-                    _viewModel.PropertyChanged += ViewModel_PropertyChanged;
-                    _viewModel.PropertyChanged += (s, e) =>
-                    {
-                        if (e.PropertyName == nameof(ClientViewModel.CurrentBookingStep))
-                        {
-                            Dispatcher.BeginInvoke(new Action(() => HandleBookingStepChange()), System.Windows.Threading.DispatcherPriority.Loaded);
-                        }
-                        // При переходе к ReadyToOrder сворачиваем панель оплаты
-                        if (e.PropertyName == nameof(ClientViewModel.CurrentBookingStep) && _viewModel.CurrentBookingStep == BookingStep.ReadyToOrder)
-                        {
-                            Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                if (PaymentPanelTransform != null && PaymentSelectionPanel.Visibility == Visibility.Visible)
-                                {
-                                    AnimatePanel(PaymentSelectionPanel, PaymentPanelTransform, PaymentCollapseButton, true);
-                                }
-                            }), System.Windows.Threading.DispatcherPriority.Loaded);
-                        }
-                    };
-                }
-
-                // Подписываемся на его события
-                if (_viewModel != null)
-                {
-                    _viewModel.PropertyChanged += ViewModel_PropertyChanged;
-                }
+                SubscribeToViewModel();
             };
 
 
 
             _viewModel = DataContext as ClientViewModel;
-
-            if (_viewModel != null)
-            {
-                _viewModel.PropertyChanged += ViewModel_PropertyChanged;
-            }
+            SubscribeToViewModel();
             
             // Запускаем анимацию загрузки сразу при открытии окна (с наивысшим приоритетом)
             Dispatcher.BeginInvoke(new Action(() =>
@@ -120,6 +81,8 @@ namespace TaxiWPF.Views
                 InitializeMap();
                 _virtualTrafficService = new VirtualTrafficService();
                 _virtualTrafficService.Initialize(MainMap);
+                _virtualTrafficService.OrderPickupReached += VirtualTrafficService_OrderPickupReached;
+                _virtualTrafficService.OrderCompleted += VirtualTrafficService_OrderCompleted;
                 _virtualTrafficService.Start();
             }), System.Windows.Threading.DispatcherPriority.Loaded);
             MainMap.CanDragMap = true;
@@ -270,7 +233,7 @@ namespace TaxiWPF.Views
                 MainMap.MapProvider = TaxiWPF.MapProviders.GoogleMapProvider.Instance;
 
                 GMaps.Instance.Mode = AccessMode.ServerOnly; // Отключен SQLite кэш для совместимости
-                MainMap.Position = new PointLatLng(55.1599, 61.4026); // Челябинск
+                MainMap.Position = new PointLatLng(55.0450, 60.1073); // Миасс
                 MainMap.MinZoom = 5;
                 MainMap.MaxZoom = 18;
                 MainMap.Zoom = 12;
@@ -366,9 +329,65 @@ namespace TaxiWPF.Views
             // Сразу запускаем поиск водителя
             if (_viewModel != null && _viewModel.FindTaxiCommand.CanExecute(null))
             {
-                SimulateOrder(_viewModel.PointA);
                 _viewModel.FindTaxiCommand.Execute(null);
             }
+        }
+
+        private void SubscribeToViewModel()
+        {
+            if (_viewModel == null)
+            {
+                return;
+            }
+
+            _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+            _viewModel.PropertyChanged += ViewModel_BookingStepChanged;
+            _viewModel.VirtualDriverAssigned += ViewModel_VirtualDriverAssigned;
+        }
+
+        private void UnsubscribeFromViewModel()
+        {
+            if (_viewModel == null)
+            {
+                return;
+            }
+
+            _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+            _viewModel.PropertyChanged -= ViewModel_BookingStepChanged;
+            _viewModel.VirtualDriverAssigned -= ViewModel_VirtualDriverAssigned;
+        }
+
+        private void ViewModel_VirtualDriverAssigned(PointLatLng pickup, PointLatLng dropoff)
+        {
+            _virtualTrafficService?.AssignOrder(pickup, dropoff);
+        }
+
+        private void ViewModel_BookingStepChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ClientViewModel.CurrentBookingStep))
+            {
+                Dispatcher.BeginInvoke(new Action(() => HandleBookingStepChange()), System.Windows.Threading.DispatcherPriority.Loaded);
+            }
+            if (e.PropertyName == nameof(ClientViewModel.CurrentBookingStep) && _viewModel?.CurrentBookingStep == BookingStep.ReadyToOrder)
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (PaymentPanelTransform != null && PaymentSelectionPanel.Visibility == Visibility.Visible)
+                    {
+                        AnimatePanel(PaymentSelectionPanel, PaymentPanelTransform, PaymentCollapseButton, true);
+                    }
+                }), System.Windows.Threading.DispatcherPriority.Loaded);
+            }
+        }
+
+        private void VirtualTrafficService_OrderPickupReached()
+        {
+            _viewModel?.HandlePickupReached();
+        }
+
+        private void VirtualTrafficService_OrderCompleted()
+        {
+            _viewModel?.HandleTripCompleted();
         }
 
         private void CollapseAddressPanel_Click(object sender, RoutedEventArgs e)

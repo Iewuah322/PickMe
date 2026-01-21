@@ -15,6 +15,9 @@ namespace TaxiWPF.Services
     {
         private const int DriverCount = 6;
         private const int RouteZoomLevel = 15;
+        private const double DriverSpeedMetersPerTick = 2.5;
+        private const double SpawnOffset = 0.03;
+        private const double RoamOffset = 0.015;
         private readonly Random _random = new Random();
         private readonly List<VirtualDriver> _drivers = new List<VirtualDriver>();
         private readonly List<GMapMarker> _trafficMarkers = new List<GMapMarker>();
@@ -81,19 +84,32 @@ namespace TaxiWPF.Services
             _timer = null;
         }
 
+        public event Action OrderPickupReached;
+        public event Action OrderCompleted;
+
         public void SimulateOrder(PointLatLng clientLocation)
         {
-            if (!_isRunning || _mainMap == null || clientLocation.IsEmpty)
+            AssignOrder(clientLocation, clientLocation);
+        }
+
+        public bool AssignOrder(PointLatLng pickupLocation, PointLatLng dropoffLocation)
+        {
+            if (!_isRunning || _mainMap == null || pickupLocation.IsEmpty)
             {
-                return;
+                return false;
             }
 
             if (_drivers.Count == 0)
             {
-                return;
+                return false;
             }
 
-            var marker = new GMapMarker(clientLocation)
+            if (dropoffLocation.IsEmpty)
+            {
+                dropoffLocation = pickupLocation;
+            }
+
+            var marker = new GMapMarker(pickupLocation)
             {
                 Shape = new Ellipse
                 {
@@ -113,7 +129,12 @@ namespace TaxiWPF.Services
 
             foreach (var driver in _drivers)
             {
-                var distance = GetDistanceInMeters(driver.Marker.Position, clientLocation);
+                if (driver.IsBusy)
+                {
+                    continue;
+                }
+
+                var distance = GetDistanceInMeters(driver.Marker.Position, pickupLocation);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
@@ -123,12 +144,16 @@ namespace TaxiWPF.Services
 
             if (closestDriver == null)
             {
-                return;
+                return false;
             }
 
             closestDriver.IsBusy = true;
+            closestDriver.IsStopped = false;
+            closestDriver.IsOnTrip = false;
+            closestDriver.TripDestination = dropoffLocation;
             closestDriver.CarShape.Fill = Brushes.Red;
-            UpdateRouteForDriver(closestDriver, closestDriver.Marker.Position, clientLocation);
+            UpdateRouteForDriver(closestDriver, closestDriver.Marker.Position, pickupLocation);
+            return true;
         }
 
         private void OnTick(object sender, EventArgs e)
@@ -149,8 +174,8 @@ namespace TaxiWPF.Services
             var center = _mainMap.Position;
             for (int i = 0; i < DriverCount; i++)
             {
-                var start = GetRandomNearbyPoint(center);
-                var end = GetRandomNearbyPoint(center);
+                var start = GetRandomNearbyPoint(center, SpawnOffset);
+                var end = GetRandomNearbyPoint(center, RoamOffset);
                 var rectangle = CreateDriverShape();
                 var marker = new GMapMarker(start)
                 {
@@ -172,14 +197,25 @@ namespace TaxiWPF.Services
             }
         }
 
-        private Rectangle CreateDriverShape()
+        private Shape CreateDriverShape()
         {
             var rotation = new RotateTransform(0);
-            return new Rectangle
+            return new Polygon
             {
-                Width = 10,
-                Height = 20,
                 Fill = Brushes.Black,
+                Stroke = Brushes.Black,
+                StrokeThickness = 0.5,
+                Points = new PointCollection
+                {
+                    new Point(0, 22),
+                    new Point(12, 22),
+                    new Point(12, 8),
+                    new Point(7, 8),
+                    new Point(6, 0),
+                    new Point(5, 0),
+                    new Point(4, 8),
+                    new Point(0, 8)
+                },
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 RenderTransform = rotation
             };
@@ -187,36 +223,80 @@ namespace TaxiWPF.Services
 
         private void AdvanceDriver(VirtualDriver driver)
         {
-            if (driver.RoutePoints.Count == 0)
+            if (driver.IsStopped)
             {
-                ResetDriverRoute(driver);
                 return;
             }
 
-            if (driver.RouteIndex >= driver.RoutePoints.Count - 1)
+            if (driver.RoutePoints.Count < 2)
             {
-                if (driver.IsBusy)
+                if (!driver.IsBusy)
                 {
-                    driver.IsBusy = false;
-                    driver.CarShape.Fill = Brushes.Black;
+                    ResetDriverRoute(driver);
+                }
+                return;
+            }
+
+            var remainingDistance = DriverSpeedMetersPerTick;
+            while (remainingDistance > 0)
+            {
+                if (driver.RouteIndex >= driver.RoutePoints.Count - 1)
+                {
+                    if (driver.IsBusy)
+                    {
+                        driver.Marker.Position = driver.RoutePoints.Last();
+                        if (!driver.IsOnTrip)
+                        {
+                            driver.IsOnTrip = true;
+                            OrderPickupReached?.Invoke();
+                            UpdateRouteForDriver(driver, driver.Marker.Position, driver.TripDestination);
+                            return;
+                        }
+
+                        driver.IsBusy = false;
+                        driver.IsOnTrip = false;
+                        driver.IsStopped = true;
+                        driver.CarShape.Fill = Brushes.Black;
+                        OrderCompleted?.Invoke();
+                        return;
+                    }
+
+                    ResetDriverRoute(driver);
+                    return;
                 }
 
-                ResetDriverRoute(driver);
-                return;
+                var currentPoint = driver.RoutePoints[driver.RouteIndex];
+                var nextPoint = driver.RoutePoints[driver.RouteIndex + 1];
+                var segmentDistance = GetDistanceInMeters(currentPoint, nextPoint);
+
+                if (segmentDistance <= 0.01)
+                {
+                    driver.RouteIndex++;
+                    driver.SegmentProgress = 0;
+                    continue;
+                }
+
+                var remainingSegment = segmentDistance * (1 - driver.SegmentProgress);
+                if (remainingDistance < remainingSegment)
+                {
+                    driver.SegmentProgress += remainingDistance / segmentDistance;
+                    driver.Marker.Position = Interpolate(currentPoint, nextPoint, driver.SegmentProgress);
+                    driver.Rotation.Angle = CalculateHeading(currentPoint, nextPoint);
+                    return;
+                }
+
+                driver.Marker.Position = nextPoint;
+                driver.Rotation.Angle = CalculateHeading(currentPoint, nextPoint);
+                remainingDistance -= remainingSegment;
+                driver.RouteIndex++;
+                driver.SegmentProgress = 0;
             }
-
-            var currentPoint = driver.RoutePoints[driver.RouteIndex];
-            var nextPoint = driver.RoutePoints[driver.RouteIndex + 1];
-
-            driver.Marker.Position = currentPoint;
-            driver.Rotation.Angle = CalculateHeading(currentPoint, nextPoint);
-            driver.RouteIndex++;
         }
 
         private void ResetDriverRoute(VirtualDriver driver)
         {
             var start = driver.Marker.Position;
-            var end = GetRandomNearbyPoint(_mainMap.Position);
+            var end = GetRandomNearbyPoint(_mainMap.Position, RoamOffset);
             UpdateRouteForDriver(driver, start, end);
         }
 
@@ -233,21 +313,28 @@ namespace TaxiWPF.Services
             }
 
             driver.RouteIndex = 0;
+            driver.SegmentProgress = 0;
         }
 
-        private PointLatLng GetRandomNearbyPoint(PointLatLng center)
+        private PointLatLng GetRandomNearbyPoint(PointLatLng center, double maxOffset)
         {
-            const double maxOffset = 0.002;
             var latOffset = (_random.NextDouble() - 0.5) * maxOffset;
             var lngOffset = (_random.NextDouble() - 0.5) * maxOffset;
             return new PointLatLng(center.Lat + latOffset, center.Lng + lngOffset);
+        }
+
+        private static PointLatLng Interpolate(PointLatLng start, PointLatLng end, double progress)
+        {
+            var lat = start.Lat + (end.Lat - start.Lat) * progress;
+            var lng = start.Lng + (end.Lng - start.Lng) * progress;
+            return new PointLatLng(lat, lng);
         }
 
         private static double CalculateHeading(PointLatLng current, PointLatLng next)
         {
             var deltaLat = next.Lat - current.Lat;
             var deltaLng = next.Lng - current.Lng;
-            return Math.Atan2(deltaLat, deltaLng) * 180 / Math.PI;
+            return Math.Atan2(deltaLng, deltaLat) * 180 / Math.PI;
         }
 
         private static double GetDistanceInMeters(PointLatLng start, PointLatLng end)
@@ -273,11 +360,15 @@ namespace TaxiWPF.Services
         private class VirtualDriver
         {
             public GMapMarker Marker { get; set; }
-            public Rectangle CarShape { get; set; }
+            public Shape CarShape { get; set; }
             public RotateTransform Rotation { get; set; }
             public List<PointLatLng> RoutePoints { get; set; } = new List<PointLatLng>();
             public int RouteIndex { get; set; }
+            public double SegmentProgress { get; set; }
             public bool IsBusy { get; set; }
+            public bool IsStopped { get; set; }
+            public bool IsOnTrip { get; set; }
+            public PointLatLng TripDestination { get; set; }
         }
     }
 }
