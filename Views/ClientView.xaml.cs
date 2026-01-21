@@ -428,7 +428,7 @@ namespace TaxiWPF.Views
             if (transform == null) return;
 
             double targetY = collapse ? panel.Height - 60 : 0; // При сворачивании оставляем 60px видимыми
-            string buttonContent = collapse ? "▲" : "▼";
+            string buttonContent = collapse ? "^" : "v";
 
             var animation = new System.Windows.Media.Animation.DoubleAnimation
             {
@@ -470,7 +470,7 @@ namespace TaxiWPF.Views
                     if (AddressPanelTransform != null)
                     {
                         AddressPanelTransform.Y = 0;
-                        AddressCollapseButton.Content = "▼";
+                        AddressCollapseButton.Content = "v";
                     }
                 }), System.Windows.Threading.DispatcherPriority.Loaded);
             }
@@ -482,7 +482,7 @@ namespace TaxiWPF.Views
                     if (TariffPanelTransform != null)
                     {
                         TariffPanelTransform.Y = 0;
-                        TariffCollapseButton.Content = "▼";
+                        TariffCollapseButton.Content = "v";
                     }
                 }), System.Windows.Threading.DispatcherPriority.Loaded);
             }
@@ -494,7 +494,7 @@ namespace TaxiWPF.Views
                     if (PaymentPanelTransform != null)
                     {
                         PaymentPanelTransform.Y = 0;
-                        PaymentCollapseButton.Content = "▼";
+                        PaymentCollapseButton.Content = "v";
                     }
                 }), System.Windows.Threading.DispatcherPriority.Loaded);
             }
