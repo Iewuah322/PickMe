@@ -1,9 +1,3 @@
-
-using System.Collections.Generic;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using GMap.NET;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,39 +7,20 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using GMap.NET;
 using GMap.NET.MapProviders;
-
 using GMap.NET.WindowsPresentation;
 
 namespace TaxiWPF.Services
 {
     public class VirtualTrafficService
     {
-
-        private readonly List<GMapMarker> _trafficMarkers = new List<GMapMarker>();
-        private GMapControl _map;
-        private bool _isRunning;
-
-        public void Initialize(GMapControl map)
-        {
-            _map = map;
-        }
-
-        public void Start()
-        {
-            _isRunning = true;
-        }
-
-        public void Stop()
-        {
-            _isRunning = false;
-            if (_map == null)
-
         private const int DriverCount = 6;
         private const int RouteZoomLevel = 15;
         private readonly Random _random = new Random();
         private readonly List<VirtualDriver> _drivers = new List<VirtualDriver>();
+        private readonly List<GMapMarker> _trafficMarkers = new List<GMapMarker>();
         private GMapControl _mainMap;
         private DispatcherTimer _timer;
+        private bool _isRunning;
 
         public VirtualTrafficService()
         {
@@ -69,15 +44,15 @@ namespace TaxiWPF.Services
             }
 
             if (_timer != null)
-
             {
                 return;
             }
 
+            _isRunning = true;
 
             foreach (var marker in _trafficMarkers)
             {
-                _map.Markers.Remove(marker);
+                _mainMap.Markers.Remove(marker);
             }
 
             _trafficMarkers.Clear();
@@ -94,6 +69,8 @@ namespace TaxiWPF.Services
 
         public void Stop()
         {
+            _isRunning = false;
+
             if (_timer == null)
             {
                 return;
@@ -102,20 +79,19 @@ namespace TaxiWPF.Services
             _timer.Stop();
             _timer.Tick -= OnTick;
             _timer = null;
-
         }
 
         public void SimulateOrder(PointLatLng clientLocation)
         {
-
-            if (!_isRunning || _map == null || clientLocation.IsEmpty)
-
-            if (_drivers.Count == 0)
-
+            if (!_isRunning || _mainMap == null || clientLocation.IsEmpty)
             {
                 return;
             }
 
+            if (_drivers.Count == 0)
+            {
+                return;
+            }
 
             var marker = new GMapMarker(clientLocation)
             {
@@ -129,7 +105,7 @@ namespace TaxiWPF.Services
                 }
             };
 
-            _map.Markers.Add(marker);
+            _mainMap.Markers.Add(marker);
             _trafficMarkers.Add(marker);
 
             VirtualDriver closestDriver = null;
@@ -302,7 +278,6 @@ namespace TaxiWPF.Services
             public List<PointLatLng> RoutePoints { get; set; } = new List<PointLatLng>();
             public int RouteIndex { get; set; }
             public bool IsBusy { get; set; }
-
         }
     }
 }
