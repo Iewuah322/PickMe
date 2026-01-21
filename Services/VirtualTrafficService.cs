@@ -1,3 +1,9 @@
+
+using System.Collections.Generic;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using GMap.NET;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +13,33 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using GMap.NET;
 using GMap.NET.MapProviders;
+
 using GMap.NET.WindowsPresentation;
 
 namespace TaxiWPF.Services
 {
     public class VirtualTrafficService
     {
+
+        private readonly List<GMapMarker> _trafficMarkers = new List<GMapMarker>();
+        private GMapControl _map;
+        private bool _isRunning;
+
+        public void Initialize(GMapControl map)
+        {
+            _map = map;
+        }
+
+        public void Start()
+        {
+            _isRunning = true;
+        }
+
+        public void Stop()
+        {
+            _isRunning = false;
+            if (_map == null)
+
         private const int DriverCount = 6;
         private const int RouteZoomLevel = 15;
         private readonly Random _random = new Random();
@@ -42,9 +69,18 @@ namespace TaxiWPF.Services
             }
 
             if (_timer != null)
+
             {
                 return;
             }
+
+
+            foreach (var marker in _trafficMarkers)
+            {
+                _map.Markers.Remove(marker);
+            }
+
+            _trafficMarkers.Clear();
 
             SpawnDrivers();
 
@@ -66,14 +102,35 @@ namespace TaxiWPF.Services
             _timer.Stop();
             _timer.Tick -= OnTick;
             _timer = null;
+
         }
 
         public void SimulateOrder(PointLatLng clientLocation)
         {
+
+            if (!_isRunning || _map == null || clientLocation.IsEmpty)
+
             if (_drivers.Count == 0)
+
             {
                 return;
             }
+
+
+            var marker = new GMapMarker(clientLocation)
+            {
+                Shape = new Ellipse
+                {
+                    Width = 14,
+                    Height = 14,
+                    Fill = Brushes.OrangeRed,
+                    Stroke = Brushes.DarkRed,
+                    StrokeThickness = 2
+                }
+            };
+
+            _map.Markers.Add(marker);
+            _trafficMarkers.Add(marker);
 
             VirtualDriver closestDriver = null;
             double closestDistance = double.MaxValue;
@@ -245,6 +302,7 @@ namespace TaxiWPF.Services
             public List<PointLatLng> RoutePoints { get; set; } = new List<PointLatLng>();
             public int RouteIndex { get; set; }
             public bool IsBusy { get; set; }
+
         }
     }
 }
