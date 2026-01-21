@@ -134,7 +134,9 @@ namespace TaxiWPF.Services
                     continue;
                 }
 
+
                 var distance = GetDistanceInMeters(driver.Marker.Position, pickupLocation);
+
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
@@ -149,8 +151,10 @@ namespace TaxiWPF.Services
 
             closestDriver.IsBusy = true;
             closestDriver.IsStopped = false;
+
             closestDriver.IsOnTrip = false;
             closestDriver.TripDestination = dropoffLocation;
+
             closestDriver.CarShape.Fill = Brushes.Red;
             UpdateRouteForDriver(closestDriver, closestDriver.Marker.Position, pickupLocation);
             return true;
@@ -245,6 +249,7 @@ namespace TaxiWPF.Services
                     if (driver.IsBusy)
                     {
                         driver.Marker.Position = driver.RoutePoints.Last();
+
                         if (!driver.IsOnTrip)
                         {
                             driver.IsOnTrip = true;
@@ -258,6 +263,7 @@ namespace TaxiWPF.Services
                         driver.IsStopped = true;
                         driver.CarShape.Fill = Brushes.Black;
                         OrderCompleted?.Invoke();
+
                         return;
                     }
 
@@ -269,12 +275,14 @@ namespace TaxiWPF.Services
                 var nextPoint = driver.RoutePoints[driver.RouteIndex + 1];
                 var segmentDistance = GetDistanceInMeters(currentPoint, nextPoint);
 
+
                 if (segmentDistance <= 0.01)
                 {
                     driver.RouteIndex++;
                     driver.SegmentProgress = 0;
                     continue;
                 }
+
 
                 var remainingSegment = segmentDistance * (1 - driver.SegmentProgress);
                 if (remainingDistance < remainingSegment)
@@ -367,8 +375,10 @@ namespace TaxiWPF.Services
             public double SegmentProgress { get; set; }
             public bool IsBusy { get; set; }
             public bool IsStopped { get; set; }
+
             public bool IsOnTrip { get; set; }
             public PointLatLng TripDestination { get; set; }
+
         }
     }
 }
