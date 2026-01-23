@@ -356,6 +356,7 @@ namespace TaxiWPF.ViewModels
         }
         public ObservableCollection<string> Tariffs { get; set; }
         public ICommand FindTaxiCommand { get; }
+        public ICommand OpenTripDetailsCommand { get; }
 
         public ICommand ContactSupportCommand { get; }
         private readonly SupportRepository _supportRepository;
@@ -398,6 +399,7 @@ namespace TaxiWPF.ViewModels
             // --- НОВОЕ: Подписываемся на "радиостанцию" ---
             OrderService.Instance.OrderUpdated += OnOrderUpdated;
             ContactSupportCommand = new RelayCommand(OpenSupportChat);
+            OpenTripDetailsCommand = new RelayCommand<Order>(OpenTripDetails, order => order != null);
         }
 
         private void OpenSupportChat()
@@ -409,6 +411,24 @@ namespace TaxiWPF.ViewModels
 
             var chatView = new SupportChatView(CurrentUser, ticket);
             chatView.Show();
+        }
+
+        private void OpenTripDetails(Order order)
+        {
+            if (order == null)
+            {
+                return;
+            }
+
+            var orderDetails = _orderRepository.GetOrderById(order.order_id);
+            if (orderDetails == null)
+            {
+                MessageBox.Show("Не удалось загрузить данные поездки.");
+                return;
+            }
+
+            var detailsView = new TripDetailsView(CurrentUser, orderDetails);
+            detailsView.Show();
         }
 
         private void LoadSavedCards()
