@@ -44,15 +44,20 @@ namespace TaxiWPF.ViewModels
 
             TripChatService.Instance.OnMessageReceived += HandleMessageReceived;
 
+
+            var tripNumber = $"Поездка #{_order.order_id}";
             if (_currentUser.IsDriver)
             {
-                ChatTitle = $"Чат с клиентом: {_order.OrderClient?.full_name ?? \"Клиент\"}";
-                ChatSubTitle = $"Поездка #{_order.order_id}";
+                var clientName = _order.OrderClient?.full_name ?? "Клиент";
+                ChatTitle = $"Чат с клиентом: {clientName}";
+                ChatSubTitle = tripNumber;
             }
             else
             {
-                ChatTitle = $"Чат с водителем: {_order.AssignedDriver?.full_name ?? \"Водитель\"}";
-                ChatSubTitle = $"Поездка #{_order.order_id}";
+                var driverName = _order.AssignedDriver?.full_name ?? "Водитель";
+                ChatTitle = $"Чат с водителем: {driverName}";
+                ChatSubTitle = tripNumber;
+
             }
 
             LoadMessages();
