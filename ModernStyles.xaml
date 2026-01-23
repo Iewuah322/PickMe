@@ -502,9 +502,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CompleteButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
-        <Setter Property="Background" Value="#0D6EFD"/>
-    </Style>
+    <Style x:Key="CompleteButton" TargetType="Button" BasedOn="{StaticResource AcceptButton}"/>
 
     <Style x:Key="OrdersListBox" TargetType="ListBox">
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
