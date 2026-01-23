@@ -1,0 +1,108 @@
+<Window x:Class="TaxiWPF.Views.TripDetailsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Детали поездки" Height="520" Width="760"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        FontFamily="Segoe UI"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+    <Border Background="#F0EEE9" CornerRadius="10" BorderBrush="#8D837C" BorderThickness="1">
+        <Grid>
+            <Button Content="X" Click="CloseButton_Click" Style="{StaticResource CloseButton}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0" Panel.ZIndex="100"/>
+
+            <Grid Margin="30">
+                <Border Background="#FFFFFF" CornerRadius="20" Padding="25" BorderBrush="#E0E0E0" BorderThickness="2">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" ShadowDepth="6" Opacity="0.2" Color="Black"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Детали поездки"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Foreground="#333333"
+                                   Margin="0,0,0,20"/>
+
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Поездка:" FontWeight="SemiBold" Foreground="#666666"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Order.order_id}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Клиент:" FontWeight="SemiBold" Foreground="#666666" Margin="0,10,0,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ClientName}" Margin="0,10,0,0"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Водитель:" FontWeight="SemiBold" Foreground="#666666" Margin="0,10,0,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DriverName}" Margin="0,10,0,0"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Маршрут:" FontWeight="SemiBold" Foreground="#666666" Margin="0,10,0,0"/>
+                            <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,10,0,0">
+                                <TextBlock Text="{Binding RouteFrom}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding RouteTo}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Тариф:" FontWeight="SemiBold" Foreground="#666666" Margin="0,10,0,0"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Tariff}" Margin="0,10,0,0"/>
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Оплата:" FontWeight="SemiBold" Foreground="#666666" Margin="0,10,0,0"/>
+                            <StackPanel Grid.Row="5" Grid.Column="1" Margin="0,10,0,0">
+                                <TextBlock Text="{Binding PaymentMethod}"/>
+                                <TextBlock Text="{Binding TotalPrice, StringFormat={}{0:C}, ConverterCulture=ru-RU}" FontWeight="Bold" Foreground="#FF9800" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button Grid.Row="2"
+                                Content="Открыть чат"
+                                Command="{Binding OpenChatCommand}"
+                                Width="160"
+                                Height="40"
+                                HorizontalAlignment="Right"
+                                Margin="0,20,0,0"
+                                Background="#4CAF50"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="10">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#3D9140"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Background" Value="#BDBDBD"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

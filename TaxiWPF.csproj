@@ -166,6 +166,7 @@
     <Compile Include="Models\SupportMessage.cs" />
     <Compile Include="Models\SupportTicket.cs" />
     <Compile Include="Models\Transaction.cs" />
+    <Compile Include="Models\TripChatMessage.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="MapProviders\GoogleMapProvider.cs" />
     <Compile Include="MapProviders\YandexMapProvider.cs" />
@@ -192,6 +193,8 @@
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\RoleSelectionViewModel.cs" />
     <Compile Include="ViewModels\SupportChatViewModel.cs" />
+    <Compile Include="ViewModels\TripChatViewModel.cs" />
+    <Compile Include="ViewModels\TripDetailsViewModel.cs" />
     <Compile Include="Views\CarDetailsView.xaml.cs">
       <DependentUpon>CarDetailsView.xaml</DependentUpon>
     </Compile>
@@ -233,6 +236,12 @@
     </Compile>
     <Compile Include="Views\SupportChatView.xaml.cs">
       <DependentUpon>SupportChatView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TripChatView.xaml.cs">
+      <DependentUpon>TripChatView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TripDetailsView.xaml.cs">
+      <DependentUpon>TripDetailsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ТаксиDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -308,6 +317,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SupportChatView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TripChatView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TripDetailsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
