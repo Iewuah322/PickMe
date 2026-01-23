@@ -309,30 +309,37 @@
                                     <ItemsControl ItemsSource="{Binding RecentEarnings}" Margin="0,0,0,25">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Background="White" 
-                                                        CornerRadius="10" 
-                                                        Padding="15" 
-                                                        Margin="0,0,0,8" 
-                                                        BorderBrush="#E8E8E8" 
-                                                        BorderThickness="1">
-                                                    <Grid>
-                                                        <StackPanel VerticalAlignment="Center">
-                                                            <TextBlock Text="{Binding Description}" 
-                                                                       FontWeight="SemiBold" 
-                                                                       Foreground="#28A745"
-                                                                       FontSize="14"/>
-                                                            <TextBlock Text="{Binding Date, StringFormat={}{dd.MM.yyyy HH:mm}}" 
-                                                                       FontSize="11" 
-                                                                       Foreground="#999999"/>
-                                                        </StackPanel>
-                                                        <TextBlock Text="{Binding Amount, StringFormat='+{0:C}', ConverterCulture=ru-RU}" 
-                                                                   FontWeight="Bold" 
-                                                                   FontSize="16"
-                                                                   VerticalAlignment="Center" 
-                                                                   HorizontalAlignment="Right" 
-                                                                   Foreground="#28A745"/>
-                                                    </Grid>
-                                                </Border>
+                                                <Button Command="{Binding DataContext.OpenRecentTripDetailsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="Transparent"
+                                                        BorderThickness="0"
+                                                        Padding="0"
+                                                        Cursor="Hand">
+                                                    <Border Background="White" 
+                                                            CornerRadius="10" 
+                                                            Padding="15" 
+                                                            Margin="0,0,0,8" 
+                                                            BorderBrush="#E8E8E8" 
+                                                            BorderThickness="1">
+                                                        <Grid>
+                                                            <StackPanel VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Description}" 
+                                                                           FontWeight="SemiBold" 
+                                                                           Foreground="#28A745"
+                                                                           FontSize="14"/>
+                                                                <TextBlock Text="{Binding Date, StringFormat={}{dd.MM.yyyy HH:mm}}" 
+                                                                           FontSize="11" 
+                                                                           Foreground="#999999"/>
+                                                            </StackPanel>
+                                                            <TextBlock Text="{Binding Amount, StringFormat='+{0:C}', ConverterCulture=ru-RU}" 
+                                                                       FontWeight="Bold" 
+                                                                       FontSize="16"
+                                                                       VerticalAlignment="Center" 
+                                                                       HorizontalAlignment="Right" 
+                                                                       Foreground="#28A745"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </Button>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
