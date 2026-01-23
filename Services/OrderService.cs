@@ -81,6 +81,10 @@ namespace TaxiWPF.Services
                     var updatedOrder = _orderRepository.GetOrderById(order.order_id);
                     if (updatedOrder != null)
                     {
+                        if (updatedOrder.AssignedDriver == null && existingOrder.AssignedDriver != null)
+                        {
+                            updatedOrder.AssignedDriver = existingOrder.AssignedDriver;
+                        }
                         Notify(updatedOrder);
                     }
                     else
@@ -140,6 +144,11 @@ namespace TaxiWPF.Services
         {
             var existingOrder = _orderRepository.GetOrderById(orderWithDriverInfo.order_id);
 
+            if (existingOrder != null && existingOrder.AssignedDriver == null && orderWithDriverInfo.AssignedDriver != null)
+            {
+                existingOrder.AssignedDriver = orderWithDriverInfo.AssignedDriver;
+            }
+
             // Обновляем, только если текущий статус совпадает с ожидаемым
             if (existingOrder != null && existingOrder.Status == expectedCurrentState)
             {
@@ -151,6 +160,10 @@ namespace TaxiWPF.Services
                     var updatedOrder = _orderRepository.GetOrderById(orderWithDriverInfo.order_id);
                     if (updatedOrder != null)
                     {
+                        if (updatedOrder.AssignedDriver == null && existingOrder.AssignedDriver != null)
+                        {
+                            updatedOrder.AssignedDriver = existingOrder.AssignedDriver;
+                        }
                         Notify(updatedOrder); // Оповещаем об изменении
                     }
                     else

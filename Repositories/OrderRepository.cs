@@ -256,7 +256,15 @@ namespace TaxiWPF.Repositories
                     // Самый надежный способ передать ID водителя или NULL
                     if (order.AssignedDriver != null && order.AssignedDriver.driver_id > 0)
                     {
-                        command.Parameters.AddWithValue("@driver_id", order.AssignedDriver.driver_id);
+                        if (DriverExists(connection, order.AssignedDriver.driver_id))
+                        {
+                            command.Parameters.AddWithValue("@driver_id", order.AssignedDriver.driver_id);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[UpdateOrder] Водитель {order.AssignedDriver.driver_id} не найден в Users. Сохраняем driver_id = NULL.");
+                            command.Parameters.AddWithValue("@driver_id", DBNull.Value);
+                        }
                     }
                     else
                     {
@@ -330,6 +338,15 @@ namespace TaxiWPF.Repositories
                 }
             }
             return order;
+        }
+
+        private bool DriverExists(SqlConnection connection, int driverId)
+        {
+            using (var checkCmd = new SqlCommand("SELECT COUNT(1) FROM Users WHERE user_id = @driver_id", connection))
+            {
+                checkCmd.Parameters.AddWithValue("@driver_id", driverId);
+                return (int)checkCmd.ExecuteScalar() > 0;
+            }
         }
 
         // Получение списка доступных заказов (для водителя)
