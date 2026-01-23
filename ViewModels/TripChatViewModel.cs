@@ -44,6 +44,7 @@ namespace TaxiWPF.ViewModels
 
             TripChatService.Instance.OnMessageReceived += HandleMessageReceived;
 
+
             var tripNumber = $"Поездка #{_order.order_id}";
             if (_currentUser.IsDriver)
             {
@@ -56,6 +57,7 @@ namespace TaxiWPF.ViewModels
                 var driverName = _order.AssignedDriver?.full_name ?? "Водитель";
                 ChatTitle = $"Чат с водителем: {driverName}";
                 ChatSubTitle = tripNumber;
+
             }
 
             LoadMessages();
