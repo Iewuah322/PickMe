@@ -14,6 +14,7 @@ using TaxiWPF.Views;
 using Microsoft.Win32;
 using System.IO;
 using TaxiWPF.Services;
+using System.Text.RegularExpressions;
 
 
 
@@ -37,6 +38,7 @@ namespace TaxiWPF.ViewModels
         private string _cardExpiryError;
         private string _cvvError;
         private readonly UserRepository _userRepository;
+        private readonly OrderRepository _orderRepository;
         private bool _isProfilePanelVisible = false;
         private bool _isCarSelectionVisible = false;
         private bool _isCarDetailsVisible = false;
@@ -70,6 +72,7 @@ namespace TaxiWPF.ViewModels
         public ICommand UpdateProfilePhotoCommand { get; }
         public ICommand UpdateLicensePhotoCommand { get; }
         public ICommand ContactSupportCommand { get; }
+        public ICommand OpenRecentTripDetailsCommand { get; }
         private readonly SupportRepository _supportRepository;
 
 
@@ -250,6 +253,7 @@ namespace TaxiWPF.ViewModels
             _walletRepository = new WalletRepository();
             _userRepository = new UserRepository();
             _supportRepository = new SupportRepository();
+            _orderRepository = new OrderRepository();
             _carRepository = new CarRepository();
 
             RecentEarnings = new ObservableCollection<Transaction>();
@@ -267,6 +271,7 @@ namespace TaxiWPF.ViewModels
             UpdateProfilePhotoCommand = new RelayCommand(() => UpdatePhoto("profile"));
             UpdateLicensePhotoCommand = new RelayCommand(() => UpdatePhoto("license"));
             ContactSupportCommand = new RelayCommand(OpenSupportChat);
+            OpenRecentTripDetailsCommand = new RelayCommand<Transaction>(OpenRecentTripDetails, transaction => transaction != null);
             ToggleWithdrawPanelCommand = new RelayCommand(() => IsWithdrawPanelVisible = !IsWithdrawPanelVisible);
             WithdrawCommand = new RelayCommand(Withdraw, CanWithdraw);
             GoToMapCommand = new RelayCommand(GoToMap);
@@ -295,6 +300,52 @@ namespace TaxiWPF.ViewModels
 
             var chatView = new SupportChatView(CurrentUser, ticket);
             chatView.Show();
+        }
+
+        private void OpenRecentTripDetails(Transaction transaction)
+        {
+            if (transaction == null)
+            {
+                return;
+            }
+
+            var orderId = TryParseOrderId(transaction.Description);
+            if (!orderId.HasValue)
+            {
+                MessageBox.Show("Не удалось определить номер поездки для этого поступления.");
+                return;
+            }
+
+            var order = _orderRepository.GetOrderById(orderId.Value);
+            if (order == null)
+            {
+                MessageBox.Show("Не удалось загрузить данные поездки.");
+                return;
+            }
+
+            var detailsView = new TripDetailsView(CurrentUser, order);
+            detailsView.Show();
+        }
+
+        private int? TryParseOrderId(string description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                return null;
+            }
+
+            var match = Regex.Match(description, @"#(\d+)");
+            if (!match.Success)
+            {
+                return null;
+            }
+
+            if (int.TryParse(match.Groups[1].Value, out var orderId))
+            {
+                return orderId;
+            }
+
+            return null;
         }
 
         private void UpdatePhoto(string photoType)
