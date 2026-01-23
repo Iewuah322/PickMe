@@ -42,7 +42,9 @@ namespace TaxiWPF.ViewModels
             Messages = new ObservableCollection<TripChatMessage>();
             SendMessageCommand = new RelayCommand(SendMessage, () => !string.IsNullOrWhiteSpace(NewMessageText));
 
+
             global::TaxiWPF.Services.TripChatService.Instance.OnMessageReceived += HandleMessageReceived;
+
 
             var tripNumber = $"Поездка #{_order.order_id}";
             if (_currentUser.IsDriver)
@@ -56,6 +58,8 @@ namespace TaxiWPF.ViewModels
                 var driverName = _order.AssignedDriver?.full_name ?? "Водитель";
                 ChatTitle = $"Чат с водителем: {driverName}";
                 ChatSubTitle = tripNumber;
+
+
             }
 
             LoadMessages();
@@ -64,7 +68,9 @@ namespace TaxiWPF.ViewModels
         private void LoadMessages()
         {
             Messages.Clear();
+
             var messages = global::TaxiWPF.Services.TripChatService.Instance.GetMessages(_order.order_id);
+
             foreach (var message in messages)
             {
                 message.IsFromCurrentUser = message.SenderId == _currentUser.user_id;
@@ -93,13 +99,17 @@ namespace TaxiWPF.ViewModels
 
         private void SendMessage()
         {
+
             global::TaxiWPF.Services.TripChatService.Instance.SendMessage(_order.order_id, _currentUser.user_id, _currentUser.full_name, NewMessageText);
+
             NewMessageText = string.Empty;
         }
 
         public void Cleanup()
         {
+
             global::TaxiWPF.Services.TripChatService.Instance.OnMessageReceived -= HandleMessageReceived;
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
