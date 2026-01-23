@@ -1,5 +1,7 @@
 using System;
+
 using System.Collections.Generic;
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -7,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using TaxiWPF.Models;
+
 
 namespace TaxiWPF.ViewModels
 {
@@ -34,9 +37,11 @@ namespace TaxiWPF.ViewModels
 
         public ICommand SendMessageCommand { get; }
 
+
         private static readonly object _syncRoot = new object();
         private static readonly Dictionary<int, List<TripChatMessage>> _messagesByOrderId = new Dictionary<int, List<TripChatMessage>>();
         private static event Action<TripChatMessage> MessageReceived;
+
 
         public TripChatViewModel(User currentUser, Order order)
         {
@@ -46,7 +51,9 @@ namespace TaxiWPF.ViewModels
             Messages = new ObservableCollection<TripChatMessage>();
             SendMessageCommand = new RelayCommand(SendMessage, () => !string.IsNullOrWhiteSpace(NewMessageText));
 
+
             MessageReceived += HandleMessageReceived;
+
 
             var tripNumber = $"Поездка #{_order.order_id}";
             if (_currentUser.IsDriver)
@@ -60,6 +67,8 @@ namespace TaxiWPF.ViewModels
                 var driverName = _order.AssignedDriver?.full_name ?? "Водитель";
                 ChatTitle = $"Чат с водителем: {driverName}";
                 ChatSubTitle = tripNumber;
+
+
             }
 
             LoadMessages();
@@ -68,7 +77,9 @@ namespace TaxiWPF.ViewModels
         private void LoadMessages()
         {
             Messages.Clear();
+
             var messages = GetMessages(_order.order_id);
+
             foreach (var message in messages)
             {
                 message.IsFromCurrentUser = message.SenderId == _currentUser.user_id;
@@ -97,6 +108,7 @@ namespace TaxiWPF.ViewModels
 
         private void SendMessage()
         {
+
             SendMessage(_order.order_id, _currentUser.user_id, _currentUser.full_name, NewMessageText);
             NewMessageText = string.Empty;
         }
@@ -148,6 +160,7 @@ namespace TaxiWPF.ViewModels
             }
 
             MessageReceived?.Invoke(newMessage);
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -179,6 +179,7 @@
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\OrderService.cs" />
     <Compile Include="Services\SupportService.cs" />
+    <Compile Include="Services\TripChatService.cs" />
     <Compile Include="ViewModels\CarDetailsViewModel.cs" />
     <Compile Include="ViewModels\CarSelectionViewModel.cs" />
     <Compile Include="ViewModels\ClientViewModel.cs" />
